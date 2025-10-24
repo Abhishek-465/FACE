@@ -2,14 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link rel="stylesheet" href="style.css" />
   <title>Interactive Face</title>
 </head>
 <body>
-  <div class="container">
-    <div class="face">
+  <div class="container" id="container">
+    <!-- 😃 FACE SECTION -->
+    <div class="face" id="face">
       <div class="eyes" id="eyes">
         <img id="eyesImg" src="normal.gif" alt="eyes" />
       </div>
@@ -20,6 +21,16 @@
         <div class="up"></div>
         <div class="down"></div>
       </div>
+    </div>
+
+    <!-- ✅ TO-DO LIST SECTION -->
+    <div class="todo hidden" id="todo">
+      <h2>📝 To-Do List</h2>
+      <div class="todo-input">
+        <input type="text" id="taskInput" placeholder="Enter your task..." />
+        <button id="addTask">Add</button>
+      </div>
+      <ul id="taskList"></ul>
     </div>
   </div>
 
