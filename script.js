@@ -16,6 +16,281 @@ const fearGif = "fear.gif";
 const happyGif = "love.gif";
 const hugGif = "hug.gif";
 const waterGif = "water.gif";
+const waveGif = "wave.gif";
+
+
+// ==========================================
+// 🤖 Voice Assistant Feature (Toggle Mode)
+// ==========================================
+let assistantMode = false;
+let recognition;
+const synth = window.speechSynthesis;
+
+// --- Initialize Speech Recognition ---
+if ("webkitSpeechRecognition" in window) {
+  recognition = new webkitSpeechRecognition();
+  recognition.lang = "en-IN";
+  recognition.continuous = false;
+  recognition.interimResults = false;
+} else {
+  alert("Speech Recognition not supported on this browser!");
+}
+
+// --- Helper: Speak with funny robotic voice ---
+// --- Helper: Speak with Indian-accented voice ---
+function speak(text) {
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = "en-IN"; // Indian English
+  utter.pitch = 1.05;
+  utter.rate = 0.95;
+  utter.volume = 1;
+
+  // Load voices asynchronously (some browsers delay voice loading)
+  const loadVoices = () => {
+    const voices = synth.getVoices();
+
+    // Prefer Indian voices if available
+    const indianVoice =
+      voices.find(v => 
+        v.lang.includes("IN") ||
+        v.name.toLowerCase().includes("hindi") ||
+        v.name.toLowerCase().includes("indian") ||
+        v.name.toLowerCase().includes("google भारतीय")
+      ) || voices.find(v => v.lang.startsWith("en-")) || voices[0];
+
+    utter.voice = indianVoice;
+    synth.speak(utter);
+  };
+
+  if (synth.getVoices().length === 0) {
+    synth.onvoiceschanged = loadVoices;
+  } else {
+    loadVoices();
+  }
+}
+
+
+// --- Listen and respond ---
+function startListening() {
+  if (!recognition) return;
+
+  recognition.start();
+
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript.toLowerCase();
+    console.log("You said:", transcript);
+    handleCommand(transcript);
+  };
+
+  recognition.onerror = (event) => {
+    console.error("Recognition error:", event.error);
+  };
+
+  recognition.onend = () => {
+    // Restart listening if still in assistant mode
+    if (assistantMode) recognition.start();
+  };
+}
+
+// --- Rule-based command responses ---
+function handleCommand(text) {
+  let reply = "";
+
+  // --- General Chat ---
+  if (text.includes("abhishek")) {
+  reply = "Ah, Abhishek! He sometimes get mad to make projects like me!";
+  }
+  else if (text.includes("hello") || text.includes("hi")|| text.includes("namaste"))  {
+    reply = "Hello friend! Nice to see you!";
+  } else if (text.includes("how are you")) {
+    reply = "I am fine, slightly overworked, but happy to see you!";
+  } else if (text.includes("name")|| text.includes("face")) {
+    reply = "You can call me the FACE, Fascinating Assistance Collaborative Epitome!";
+  } else if (text.includes("bye")) {
+    reply = "Goodbye human. Powering down my emotions!";
+  } else if (text.includes("weather")) {
+    reply = "Sorry, I am allergic to the outdoors. But probably it’s hot!";
+  } else if (text.includes("time")) {
+    reply = "The time is " + new Date().toLocaleTimeString("en-IN");
+  } else if (text.includes("date")) {
+    reply = "Today is " + new Date().toLocaleDateString("en-IN");
+  } else if (text.includes("joke")) {
+    reply = "Why did the robot go on vacation? To recharge its batteries!";
+  }
+
+  // --- Motivation ---
+  else if (text.includes("motivation") || text.includes("inspire")) {
+    const quotes = [
+      "Believe you can and you're halfway there. – Theodore Roosevelt",
+      "Don’t watch the clock; do what it does. Keep going. – Sam Levenson",
+      "The future belongs to those who believe in the beauty of their dreams. – Eleanor Roosevelt",
+      "Success is not final, failure is not fatal: it is the courage to continue that counts. – Winston Churchill",
+      "The only way to do great work is to love what you do. – Steve Jobs",
+      "Difficulties in life are intended to make us better, not bitter.",
+      "Push yourself, because no one else is going to do it for you.",
+      "Great things never come from comfort zones.",
+      "Dream big, work hard, stay humble.",
+      "Your limitation—it’s only your imagination.",
+      "APJ Abdul Kalam once said, 'Dream is not that which you see while sleeping, it is something that does not let you sleep.'"
+    ];
+    reply = quotes[Math.floor(Math.random() * quotes.length)];
+  }
+
+  // --- Sports ---
+  else if (text.includes("messi")) {
+    reply = "Messi is a magician with the ball — 8 Ballon d’Ors, countless assists, and a heart full of passion!";
+  } else if (text.includes("ronaldo")) {
+    reply = "Cristiano Ronaldo — the beast of fitness and hard work! CR7 never stops grinding.";
+  } else if (text.includes("football")) {
+    reply = "Football — the world’s favorite sport! 90 minutes of pure adrenaline!";
+  } else if (text.includes("cricket")) {
+    reply = "Cricket is like a religion in India! From Sachin to Kohli, the legacy is unending!";
+  } else if (text.includes("virat")) {
+    reply = "Virat Kohli — aggression, class, and consistency personified!";
+  } else if (text.includes("dhoni")) {
+    reply = "Captain Cool MS Dhoni — the man who finishes games like a legend.";
+  } else if (text.includes("tennis")) {
+    reply = "Tennis — the sport of grace and power! Federer, Nadal, and Djokovic — pure legends.";
+
+  // --- Space & Astrophysics ---
+  } else if (text.includes("space")) {
+    reply = "Space is vast and mysterious — an ocean of stars, galaxies, and cosmic wonders!";
+  } else if (text.includes("black hole")) {
+    reply = "A black hole is a region in space where gravity is so strong that nothing, not even light, can escape!";
+  } else if (text.includes("earth")) {
+    reply = "Earth — our beautiful blue planet, the only known home of life!";
+  } else if (text.includes("moon")) {
+    reply = "The Moon — Earth's loyal companion, influencing tides and inspiring dreams.";
+  } else if (text.includes("sun")) {
+    reply = "The Sun is a giant ball of burning plasma providing us energy and life!";
+  } else if (text.includes("galaxy")) {
+    reply = "Our galaxy, the Milky Way, contains over 100 billion stars!";
+  } else if (text.includes("nasa")) {
+    reply = "NASA — the pioneers of space exploration since 1958!";
+  } else if (text.includes("isro")) {
+    reply = "ISRO — India’s pride! From Chandrayaan to Aditya-L1, they’re reaching new heights!";
+  } else if (text.includes("star")) {
+    reply = "Stars are glowing spheres of plasma held together by gravity, just like our Sun!";
+  }
+
+  // --- Science & Technology ---
+  else if (text.includes("physics")) {
+    reply = "Physics — the study of how everything works, from atoms to galaxies!";
+  } else if (text.includes("chemistry")) {
+    reply = "Chemistry — the science of reactions, elements, and the magic of molecules!";
+  } else if (text.includes("biology")) {
+    reply = "Biology — the study of living organisms and the secrets of life!";
+  } else if (text.includes("robot")) {
+    reply = "Robots like me dream of electric sheep — kidding! We just love serving humans!";
+  } else if (text.includes("ai")) {
+    reply = "Artificial Intelligence — the future of innovation, from chatbots to self-driving cars!";
+  } else if (text.includes("technology")) {
+    reply = "Technology has made the world smaller, faster, and smarter — just like me!";
+  } else if (text.includes("computer")) {
+    reply = "Computers are binary beasts — 0s and 1s creating infinite possibilities!";
+  }
+
+  // --- World & Geography ---
+  else if (text.includes("india")) {
+    reply = "India — the land of diversity, culture, and innovation!";
+  } else if (text.includes("usa")) {
+    reply = "The USA — home of Silicon Valley, NASA, and Hollywood!";
+  } else if (text.includes("china")) {
+    reply = "China — a country with ancient history and futuristic ambitions!";
+  } else if (text.includes("river")) {
+    reply = "Rivers are the veins of Earth — carrying life wherever they flow!";
+  } else if (text.includes("mountain")) {
+    reply = "Mountains stand tall, reminding us that persistence leads to greatness!";
+  } else if (text.includes("everest")) {
+    reply = "Mount Everest — the roof of the world, 8,848 meters of pure challenge!";
+  } else if (text.includes("ocean")) {
+    reply = "Oceans cover 71% of Earth and are full of unexplored mysteries!";
+  } else if (text.includes("continent")) {
+    reply = "There are 7 continents — Asia, Africa, North America, South America, Antarctica, Europe, and Australia.";
+
+  // --- Famous Personalities ---
+  } else if (text.includes("elon musk")) {
+    reply = "Elon Musk — the real-life Iron Man! Tesla, SpaceX, and endless innovation.";
+  } else if (text.includes("apj abdul kalam")) {
+    reply = "Dr. APJ Abdul Kalam — the Missile Man of India and a visionary who inspired millions!";
+  } else if (text.includes("einstein")) {
+    reply = "Albert Einstein — the genius who redefined physics with E equals mc squared!";
+  } else if (text.includes("newton")) {
+    reply = "Isaac Newton — the man who explained gravity after an apple fell on his head!";
+  } else if (text.includes("gandhi")) {
+    reply = "Mahatma Gandhi — the symbol of peace, truth, and non-violence.";
+  } else if (text.includes("modi")) {
+    reply = "Narendra Modi — the Prime Minister of India, known for bold policies and global diplomacy.";
+  } else if (text.includes("obama")) {
+    reply = "Barack Obama — the 44th President of the USA, known for his inspiring leadership.";
+  } else if (text.includes("putin")) {
+    reply = "Vladimir Putin — the strongman leader of Russia.";
+  } else if (text.includes("trump")) {
+    reply = "Donald Trump — the businessman-turned-president with a flair for drama!";
+  } else if (text.includes("neymar")) {
+    reply = "Neymar Jr. — flair, speed, and samba style football!";
+  } else if (text.includes("sachin")) {
+    reply = "Sachin Tendulkar — the God of Cricket, pure class and dedication!";
+  } else if (text.includes("ambedkar")) {
+    reply = "Dr. B.R. Ambedkar — the architect of India’s constitution and a true reformer.";
+  } else if (text.includes("steve jobs")) {
+    reply = "Steve Jobs — the man who put the world in our pockets with the iPhone.";
+  } else if (text.includes("bill gates")) {
+    reply = "Bill Gates — the tech visionary who made computers a household name.";
+  } else if (text.includes("tesla")) {
+    reply = "Nikola Tesla — the real spark behind modern electricity and wireless ideas!";
+  } else if (text.includes("abhishek")) {
+  reply = "Ah, Abhishek! He sometimes get mad to make projects like me!";
+} else if (text.includes("jadavpur") || text.includes("ju")) {
+  reply = "Jadavpur University — one of the finest in India! A blend of intellect, innovation, and incredible chai near Gate 4.";
+} else if (text.includes("iit")) {
+  reply = "IITs — the dream factories of India! Where caffeine meets code and equations meet excellence.";
+} else if (text.includes("jee")) {
+  reply = "JEE — the legendary exam that builds patience, stress endurance, and future engineers!";
+} else if (text.includes("gate")) {
+  reply = "GATE — the graduate engineer’s rite of passage. Crack it once, and you unlock a whole new world of opportunities!";
+} else if (text.includes("ritwika") || text.includes("ritvika") || text.includes("rithvika")) {
+  reply = "Ritwika — sounds like someone truly special! She is beauty with brains. I think Abhishek smiles whenever that name comes up.";
+}
+
+  // --- Random Fun Facts ---
+  else if (text.includes("fact")) {
+    const facts = [
+      "Honey never spoils — archaeologists found 3000-year-old honey still edible!",
+      "Octopuses have three hearts and blue blood.",
+      "Bananas are berries, but strawberries are not!",
+      "The Eiffel Tower can grow taller in summer due to heat expansion.",
+      "A day on Venus is longer than a year on Venus.",
+      "Sharks existed before trees — 400 million years ago!",
+      "Your brain generates about 20 watts of power while awake."
+    ];
+    reply = facts[Math.floor(Math.random() * facts.length)];
+  }
+
+  // --- Default ---
+  else {
+    reply = "I didn't quite catch that, but I still love your energy!";
+  }
+
+  speak(reply);
+}
+
+// --- Toggle Assistant Mode on Double Tap ---
+let tapTimer = 0;
+document.addEventListener("dblclick", () => {
+  assistantMode = !assistantMode;
+
+  if (assistantMode) {
+    speak("Namaste ! I am the FACE. What can I do for you?");
+    startListening();
+    eyesImg.src = waveGif; // face reacts
+  } else {
+    if (recognition) recognition.stop();
+    speak("Going back to normal mode. Bye bye!");
+    eyesImg.src = normalGif;
+  }
+});
+
 
 // --- Eye animation ---
 function changeEyes(gifPath, duration = 5000) {
