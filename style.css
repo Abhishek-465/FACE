@@ -1,0 +1,120 @@
+body {
+  background: radial-gradient(circle at center, #2b2b2b, #000);
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+img {
+  user-select: none;
+}
+
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background-color: #d9d9d9;
+  height: 800px;
+  width: 800px;
+  border-radius: 40px;
+  box-shadow: 0 0 50px rgba(255, 255, 255, 0.2),
+              inset 0 0 20px rgba(0, 0, 0, 0.4);
+}
+
+.face {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  background-color: #111;
+  height: 550px;
+  width: 550px;
+  border-radius: 40px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.8);
+  transition: all 0.4s ease;
+}
+
+.eyes {
+  width: 500px;
+  height: 250px;
+  background-color: #e9e9e9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 30px;
+  overflow: hidden;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5),
+              0 0 25px rgba(255, 255, 255, 0.2);
+  margin-top: 30px;
+  transition: 0.3s ease;
+}
+
+.eyes img {
+  width: 480px;
+  height: 210px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
+#eyesImg {
+  transition: opacity 0.5s ease-in-out;  /* smooth fade animation */
+  opacity: 1;
+}
+.fade-out {
+  opacity: 0;
+}
+.fade-in {
+  opacity: 1;
+}
+
+
+.nose {
+  width: 0;
+  height: 0;
+  border-left: 65px solid transparent;
+  border-right: 65px solid transparent;
+  border-top: 150px solid #3b2a2a;
+  margin: 20px 0;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.nose:hover {
+  transform: scale(1.1);
+}
+
+.mouth {
+  margin-top: auto;
+  padding-bottom: 60px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+
+.up,
+.down {
+  background-color: #e9e9e9;
+  border-radius: 10px;
+  transition: transform 0.2s ease;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.4);
+}
+
+.up {
+  width: 400px;
+  height: 20px;
+  margin-bottom: 10px;
+}
+
+.down {
+  width: 300px;
+  height: 18px;
+}
+
+.mouth:hover .up,
+.mouth:hover .down {
+  transform: scale(1.05);
+}
