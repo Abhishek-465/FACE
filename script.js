@@ -109,7 +109,7 @@ function handleCommand(text) {
   }
   else if (text.includes("hello") || text.includes("hi")|| text.includes("namaste"))  {
     reply = "Hello friend! Nice to see you!";
-  } else if (text.includes("how are you")) {
+  } else if (text.includes("you")) {
     reply = "I am fine, slightly overworked, but happy to see you!";
   } else if (text.includes("name")|| text.includes("face")) {
     reply = "You can call me the FACE, Fascinating Assistance Collaborative Epitome!";
@@ -340,13 +340,7 @@ mouth.addEventListener("click", (e) => {
   changeEyes(eyeChange3);
 });
 
-// --- Double Tap detection ---
-let lastTap = 0;
-container.addEventListener("touchstart", (e) => {
-  const now = Date.now();
-  if (now - lastTap < 300) changeEyes(fearGif);
-  lastTap = now;
-});
+
 
 // --- Swipe detection ---
 let startX, startY, endX, endY;
@@ -479,6 +473,7 @@ container.addEventListener("click", (e) => {
     todo.classList.toggle("hidden");
   }
 });
+
 
 
 
