@@ -25,6 +25,7 @@ const waveGif = "wave.gif";
 let assistantMode = false;
 let recognition;
 const synth = window.speechSynthesis;
+let isSpeaking = false; // <--- Track speaking state
 
 // --- Initialize Speech Recognition ---
 if ("webkitSpeechRecognition" in window) {
@@ -471,5 +472,6 @@ container.addEventListener("click", (e) => {
     todo.classList.toggle("hidden");
   }
 });
+
 
 
