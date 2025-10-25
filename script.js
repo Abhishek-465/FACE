@@ -72,7 +72,7 @@ function speak(text) {
 
 // --- Listen and respond ---
 function startListening() {
-  if (!recognition) return;
+  if (!recognition || isSpeaking) return; // <-- Don’t listen while speaking
 
   recognition.start();
 
@@ -87,8 +87,10 @@ function startListening() {
   };
 
   recognition.onend = () => {
-    // Restart listening if still in assistant mode
-    if (assistantMode) recognition.start();
+    if (assistantMode && !isSpeaking) {
+      // Restart listening only if finished speaking
+      startListening();
+    }
   };
 }
 
@@ -458,3 +460,4 @@ container.addEventListener("click", (e) => {
     todo.classList.toggle("hidden");
   }
 });
+
