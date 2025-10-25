@@ -100,7 +100,7 @@ function handleCommand(text) {
 
   // --- General Chat ---
   if (text.includes("abhishek")) {
-  reply = "Ah, Abhishek! He sometimes get mad to make projects like me!";
+  reply = "Ah, Abhishek! He sometimes get mad to make projects like me! He is my friend";
   }
   else if (text.includes("hello") || text.includes("hi")|| text.includes("namaste"))  {
     reply = "Hello friend! Nice to see you!";
@@ -254,6 +254,17 @@ function handleCommand(text) {
 } else if (text.includes("ritwika") || text.includes("ritvika") || text.includes("rithvika")) {
   reply = "Ritwika — sounds like someone truly special! She is beauty with brains. I think Abhishek smiles whenever that name comes up.";
 }
+    else if (text.includes("love")) {
+    reply = "Love — the most powerful force in the universe, connecting hearts beyond logic!";
+  } else if (text.includes("animal")) {
+    reply = "Animals are amazing beings — pure, loyal, and full of natural wisdom!";
+  } else if (text.includes("god")) {
+    reply = "God — the ultimate mystery that people seek in different ways, yet find within themselves.";
+  } else if (text.includes("nature")) {
+    reply = "Nature is the greatest artist — from mountains to oceans, it paints life in every color!";
+  } else if (text.includes("life")) {
+    reply = "Life is a journey of growth, love, mistakes, and learning — make every moment meaningful!";
+  }
 
   // --- Random Fun Facts ---
   else if (text.includes("fact")) {
@@ -460,4 +471,5 @@ container.addEventListener("click", (e) => {
     todo.classList.toggle("hidden");
   }
 });
+
 
