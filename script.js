@@ -109,7 +109,7 @@ function handleCommand(text) {
   }
   else if (text.includes("hello") || text.includes("hi")|| text.includes("namaste"))  {
     reply = "Hello friend! Nice to see you!";
-  } else if (text.includes("you")) {
+  } else if (text.includes(" are you")) {
     reply = "I am fine, slightly overworked, but happy to see you!";
   } else if (text.includes("name")|| text.includes("face")) {
     reply = "You can call me the FACE, Fascinating Assistance Collaborative Epitome!";
@@ -189,7 +189,7 @@ function handleCommand(text) {
     reply = "Biology — the study of living organisms and the secrets of life!";
   } else if (text.includes("robot")) {
     reply = "Robots like me dream of electric sheep — kidding! We just love serving humans!";
-  } else if (text.includes("ai")) {
+  } else if (text.includes("ai") || text.includes("machine learning")) {
     reply = "Artificial Intelligence — the future of innovation, from chatbots to self-driving cars!";
   } else if (text.includes("technology")) {
     reply = "Technology has made the world smaller, faster, and smarter — just like me!";
@@ -473,6 +473,7 @@ container.addEventListener("click", (e) => {
     todo.classList.toggle("hidden");
   }
 });
+
 
 
 
