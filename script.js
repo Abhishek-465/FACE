@@ -39,20 +39,24 @@ if ("webkitSpeechRecognition" in window) {
 
 // --- Helper: Speak with funny robotic voice ---
 // --- Helper: Speak with Indian-accented voice ---
-function speak(text) {
+function speak(text, callback) {
   const utter = new SpeechSynthesisUtterance(text);
-  utter.lang = "en-IN"; // Indian English
+  utter.lang = "en-IN";
   utter.pitch = 1.05;
   utter.rate = 0.95;
   utter.volume = 1;
 
-  // Load voices asynchronously (some browsers delay voice loading)
+  isSpeaking = true;
+
+  utter.onend = () => {
+    isSpeaking = false;
+    if (callback) callback(); // Start listening only after speech completes
+  };
+
   const loadVoices = () => {
     const voices = synth.getVoices();
-
-    // Prefer Indian voices if available
     const indianVoice =
-      voices.find(v => 
+      voices.find(v =>
         v.lang.includes("IN") ||
         v.name.toLowerCase().includes("hindi") ||
         v.name.toLowerCase().includes("indian") ||
@@ -286,7 +290,9 @@ function handleCommand(text) {
     reply = "I didn't quite catch that, but I still love your energy!";
   }
 
-  speak(reply);
+    speak(reply, () => {
+    if (assistantMode) startListening();
+  });
 }
 
 // --- Toggle Assistant Mode on Double Tap ---
@@ -295,8 +301,9 @@ document.addEventListener("dblclick", () => {
   assistantMode = !assistantMode;
 
   if (assistantMode) {
-    speak("Namaste ! I am the FACE. What can I do for you?");
-    startListening();
+        speak("Namaste! I am the FACE. What can I do for you?", () => {
+      startListening();
+    });
     eyesImg.src = waveGif; // face reacts
   } else {
     if (recognition) recognition.stop();
@@ -472,6 +479,7 @@ container.addEventListener("click", (e) => {
     todo.classList.toggle("hidden");
   }
 });
+
 
 
 
