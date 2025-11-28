@@ -109,8 +109,13 @@ function handleCommand(text) {
   }
   else if (text.includes("hello") || text.includes("hi")|| text.includes("namaste"))  {
     reply = "Hello friend! Nice to see you!";
-  } else if (text.includes(" are you")) {
-    reply = "I am fine, slightly overworked, but happy to see you!";
+  }
+  else if (text.includes("how are you")) { reply = "I am functioning within acceptable emotional parameters!"; } 
+  else if (text.includes("fool")) { reply = "You are a fool my friend."; } 
+
+    
+  else if (text.includes(" are you")) {
+    reply = "I am the FACE. Your boring companion!! happy to see you!";
   } else if (text.includes("name")|| text.includes("face")) {
     reply = "You can call me the FACE, Fascinating Assistance Collaborative Epitome!";
   } else if (text.includes("bye")) {
@@ -473,6 +478,7 @@ container.addEventListener("click", (e) => {
     todo.classList.toggle("hidden");
   }
 });
+
 
 
 
