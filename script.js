@@ -98,6 +98,62 @@ function startListening() {
     }
   };
 }
+async function getLoc() {
+  try {
+    const response = await fetch("https://ipwho.is/");
+    const data = await response.json();
+
+    const city = data.city || "an unknown city";
+    const region = data.region || "";
+    const country = data.country || "Earth";
+
+    const locationText = `You seem to be in ${city}, ${region}, ${country}.`;
+
+    return locationText
+}
+catch (err) {
+    return "I cannot fetch the location because location access was blocked.";
+  }
+}
+
+
+
+async function getWeather() {
+  try {
+    // Step 1: Get user location
+    const pos = await new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject);
+    });
+
+    const lat = pos.coords.latitude;
+    const lon = pos.coords.longitude;
+
+    // Step 2: Fetch weather data
+    const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m`;
+    const airUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&hourly=pm10,pm2_5`;
+
+    const weatherRes = await fetch(weatherUrl);
+    const airRes = await fetch(airUrl);
+
+    const weatherData = await weatherRes.json();
+    const airData = await airRes.json();
+
+    const temp = weatherData.current.temperature_2m;
+    const humidity = weatherData.current.relative_humidity_2m;
+
+    const pm25 = airData.hourly.pm2_5[0];
+    const pm10 = airData.hourly.pm10[0];
+
+    let aqi = Math.round((pm25 + pm10) / 2); // simple approx AQI
+
+    return `Temperature is ${temp}°C, humidity is ${humidity}%, and the air quality index is ${aqi}.`;
+
+  } catch (err) {
+    return "I cannot fetch the weather because location access was blocked.";
+  }
+}
+
+
 
 // --- Rule-based command responses ---
 function handleCommand(text) {
@@ -111,8 +167,10 @@ function handleCommand(text) {
     reply = "Hello friend! Nice to see you!";
   }
   else if (text.includes("how are you")) { reply = "I am functioning within acceptable emotional parameters!"; } 
-  else if (text.includes("fool")) { reply = "You are a fool my friend."; } 
-
+  else if (text.includes("fool")) { reply = "You are a fool my friend."; }
+  
+  else if (text.includes("you") &&( text.includes("good")||text.includes("nice")||text.includes("great")||text.includes("best"))) { reply = "Thanks a lot my friend."; }   
+  else if (text.includes("thank")||text.includes("good")) { reply = "Most welcome my friend."; }
     
   else if (text.includes(" are you")) {
     reply = "I am the FACE. Your boring companion!! happy to see you!";
@@ -121,8 +179,33 @@ function handleCommand(text) {
   } else if (text.includes("bye")) {
     reply = "Goodbye human. Powering down my emotions!";
   } else if (text.includes("weather")) {
-    reply = "Sorry, I am allergic to the outdoors. But probably it’s hot!";
-  } else if (text.includes("time")) {
+   speak("Fetching live weather, please wait...");
+   getWeather().then(data => {
+    speak(data, () => {
+      if (assistantMode) startListening();
+    });
+   });
+   return; // prevent double speaking
+  }
+else if (text.includes("location")) {
+  speak("Fetching live location, please wait...");
+   getLoc().then(data => {
+    speak(data, () => {
+      if (assistantMode) startListening();
+    });
+   });
+   return;
+     // important: Stop normal flow
+}
+else if (text.includes("todo") || text.includes("task") || text.includes("schedule") || text.includes("list")) {
+  const tasks = getAllTasks();
+  speak(tasks, () => {
+    if (assistantMode) startListening();
+  });
+  return; // stop further execution
+}
+
+   else if (text.includes("time")) {
     reply = "The time is " + new Date().toLocaleTimeString("en-IN");
   } else if (text.includes("date")) {
     reply = "Today is " + new Date().toLocaleDateString("en-IN");
@@ -438,6 +521,17 @@ function loadTasks() {
     const li = createTaskElement(taskText);
     taskList.appendChild(li);
   });
+  
+}
+
+function getAllTasks() {
+  const savedTasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+  if (savedTasks.length === 0) {
+    return "You have no tasks right now.";
+  }
+
+  return "Your tasks are: " + savedTasks.join(", ");
 }
 
 function addTask() {

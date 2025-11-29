@@ -93,6 +93,9 @@ img {
 .nose:active {
   transform: scale(1.1);
 }
+.nose:hover{
+  border-top: 120px solid #812626;
+}
 
 /* --- Mouth --- */
 /* --- Mouth --- */
@@ -121,6 +124,10 @@ img {
   border-radius: 10px;
   transition: transform 0.2s ease;
   box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.4);
+}
+.up:hover,
+.down:hover{
+  background-color: #a64848;
 }
 
 .up {
