@@ -90,9 +90,6 @@ img {
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
-.nose:active {
-  transform: scale(1.1);
-}
 .nose:hover{
   border-top: 120px solid #812626;
 }
@@ -216,3 +213,4 @@ img {
     border-top: 90px solid #3b2a2a;
   }
 }
+
