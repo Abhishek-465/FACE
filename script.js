@@ -168,17 +168,17 @@ function handleCommand(text) {
   }
   else if (text.includes("how are you")) { reply = "I am functioning within acceptable emotional parameters!"; } 
   else if (text.includes("fool")) { reply = "You are a fool my friend."; }
-  
-  else if (text.includes("you") &&( text.includes("good")||text.includes("nice")||text.includes("great")||text.includes("best"))) { reply = "Thanks a lot my friend."; }   
+  else if (text.includes("bye")) {
+    reply = "Goodbye human. Powering down my emotions!";
+  }
+  else if (text.includes("you") &&( text.includes("good")||text.includes("nice")||text.includes("great") || text.includes("love") ||text.includes("best"))) { reply = "Thanks a lot my friend. Love you"; }   
   else if (text.includes("thank")||text.includes("good")) { reply = "Most welcome my friend."; }
     
   else if (text.includes(" are you")) {
     reply = "I am the FACE. Your boring companion!! happy to see you!";
   } else if (text.includes("name")|| text.includes("face")) {
     reply = "You can call me the FACE, Fascinating Assistance Collaborative Epitome!";
-  } else if (text.includes("bye")) {
-    reply = "Goodbye human. Powering down my emotions!";
-  } else if (text.includes("weather")) {
+   } else if (text.includes("weather")) {
    speak("Fetching live weather, please wait...");
    getWeather().then(data => {
     speak(data, () => {
@@ -572,6 +572,7 @@ container.addEventListener("click", (e) => {
     todo.classList.toggle("hidden");
   }
 });
+
 
 
 
