@@ -8,15 +8,15 @@ const face = document.getElementById("face");
 const todo = document.getElementById("todo");
 
 // --- GIF paths ---
-const normalGif = "normal.gif";
-const eyeChange1 = "fear.gif";
-const eyeChange2 = "nose.gif";
-const eyeChange3 = "eat.gif";
-const fearGif = "fear.gif";
-const happyGif = "love.gif";
-const hugGif = "hug.gif";
-const waterGif = "water.gif";
-const waveGif = "wave.gif";
+const normalGif = "images/normal.gif";
+const eyeChange1 = "images/fear.gif";
+const eyeChange2 = "images/nose.gif";
+const eyeChange3 = "images/eat.gif";
+const fearGif = "images/fear.gif";
+const happyGif = "images/love.gif";
+const hugGif = "images/hug.gif";
+const waterGif = "images/water.gif";
+const waveGif = "images/wave.gif";
 
 
 // ==========================================
@@ -26,6 +26,51 @@ let assistantMode = false;
 let recognition;
 const synth = window.speechSynthesis;
 let isSpeaking = false; // <--- Track speaking state
+
+// --- Music Player ---
+let musicPlayer = new Audio();
+const musicList = [
+  "music/music1.mp3",
+  "music/music2.mp3",
+  "music/music3.mp3",
+  "music/music4.mp3"
+];
+// --- Wikipedia Fetch Controller ---
+let wikiController = null;
+let wikiLoading = false; // track if wiki is fetching
+let wikiSpeaking = false;
+
+
+
+
+
+function applyTimeBackground() {
+  const hour = new Date().getHours();
+  let bg = "";
+
+  if (hour >= 5 && hour < 10) {
+    // Morning
+    bg = "linear-gradient(135deg, #FFF7A1, #FFE27A)";
+  } 
+  else if (hour >= 10 && hour < 16) {
+    // Day
+    bg = "linear-gradient(135deg, #87CEFA, #4facfe)";
+  } 
+  else if (hour >= 16 && hour < 19) {
+    // Evening
+    bg = "linear-gradient(135deg, #FFB56B, #FF8C42)";
+  } 
+  else {
+    // Night
+    bg = "linear-gradient(135deg, #0A0F24, #1B1F3B)";
+  }
+
+  document.body.style.background = bg;
+}
+
+// Apply on load
+applyTimeBackground();
+
 
 // --- Initialize Speech Recognition ---
 if ("webkitSpeechRecognition" in window) {
@@ -153,6 +198,51 @@ async function getWeather() {
   }
 }
 
+async function searchWikipedia(query) {
+  try {
+    // If a fetch was ongoing, abort it
+    if (wikiController) {
+      wikiController.abort();
+    }
+
+    // make new controller for each request
+    wikiController = new AbortController();
+    wikiLoading = true;
+
+    const apiUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`;
+    const response = await fetch(apiUrl, { signal: wikiController.signal });
+    const data = await response.json();
+
+    wikiLoading = false;
+
+    if (data.extract) {
+      return data.extract;
+    } else {
+      return "Sorry, I couldn't find any information on that.";
+    }
+
+  } catch (err) {
+    wikiLoading = false;
+
+    if (err.name === "AbortError") {
+      return "Wikipedia search was stopped.";
+    }
+
+    return "An error occurred while fetching data. Please mention clearly like wikipedia bill gates";
+  }
+}
+
+
+function playRandomMusic() {
+  const randomIndex = Math.floor(Math.random() * musicList.length);
+  const randomSong = musicList[randomIndex];
+
+  musicPlayer.src = randomSong;
+  musicPlayer.play();
+}
+
+
+
 
 
 // --- Rule-based command responses ---
@@ -163,22 +253,38 @@ function handleCommand(text) {
   if (text.includes("abhishek")) {
   reply = "Ah, Abhishek! He sometimes get mad to make projects like me! He is my friend";
   }
+  else if (text.includes("pedia")) {
+   speak("Fetching data from wikipedia, please wait...");
+   const query = text.substring(9).trim();
+   wikiSpeaking = true;
+   searchWikipedia(query).then(data => {
+    speak(data, () => {
+      wikiSpeaking = false;
+      if (assistantMode) startListening();
+    });
+   });
+   return; // prevent double speaking
+  }
+    else if (text.includes("listen") || text.includes("hear"))  {
+    reply = "yes friend i can listen your queries but only after i finish talking";
+  }
   else if (text.includes("hello") || text.includes("hi")|| text.includes("namaste"))  {
     reply = "Hello friend! Nice to see you!";
   }
-  else if (text.includes("how are you")) { reply = "I am functioning within acceptable emotional parameters!"; } 
+  else if (text.includes("how are you")|| text.includes("how r")) { reply = "I am functioning within acceptable emotional parameters!"; } 
   else if (text.includes("fool")) { reply = "You are a fool my friend."; }
   else if (text.includes("bye")) {
     reply = "Goodbye human. Powering down my emotions!";
   }
-  else if (text.includes("you") &&( text.includes("good")||text.includes("nice")||text.includes("great") || text.includes("love") ||text.includes("best"))) { reply = "Thanks a lot my friend. Love you"; }   
+  
+  else if (text.includes("you") &&( text.includes("good")||text.includes("nice")||text.includes("great")||text.includes("best"))) { reply = "Thanks a lot my friend."; }   
   else if (text.includes("thank")||text.includes("good")) { reply = "Most welcome my friend."; }
     
   else if (text.includes(" are you")) {
     reply = "I am the FACE. Your boring companion!! happy to see you!";
   } else if (text.includes("name")|| text.includes("face")) {
     reply = "You can call me the FACE, Fascinating Assistance Collaborative Epitome!";
-   } else if (text.includes("weather")) {
+  }  else if (text.includes("weather")) {
    speak("Fetching live weather, please wait...");
    getWeather().then(data => {
     speak(data, () => {
@@ -186,7 +292,7 @@ function handleCommand(text) {
     });
    });
    return; // prevent double speaking
-  }
+  } 
 else if (text.includes("location")) {
   speak("Fetching live location, please wait...");
    getLoc().then(data => {
@@ -196,6 +302,29 @@ else if (text.includes("location")) {
    });
    return;
      // important: Stop normal flow
+}
+else if (text.includes("youtube")) {
+  const query=text.substring(7).trim().replaceAll(" ", "");;
+  speak("Opening YouTube!", () => {
+    window.open(`https://www.youtube.com/${query}`, "_blank");
+    if (assistantMode) startListening();
+  });
+  return;
+}
+else if (text.includes("google")) {
+  const query=text.substring(6).trim().replaceAll(" ", "");;
+  speak("Opening Google!", () => {
+    window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, "_blank");
+    if (assistantMode) startListening();
+  });
+  return;
+}
+else if (text.includes("calculator")) {
+  speak("Opening Calculator!", () => {
+    window.open(`https://tcsion.com/OnlineAssessment/ScientificCalculator/Calculator.html`, "_blank");
+    if (assistantMode) startListening();
+  });
+  return;
 }
 else if (text.includes("todo") || text.includes("task") || text.includes("schedule") || text.includes("list")) {
   const tasks = getAllTasks();
@@ -372,6 +501,39 @@ else if (text.includes("todo") || text.includes("task") || text.includes("schedu
     ];
     reply = facts[Math.floor(Math.random() * facts.length)];
   }
+  else if (text.includes("music") || text.includes("song")) {
+  reply = "Playing a song which i am listening nowadays in loop!";
+  speak(reply, () => {
+    playRandomMusic();
+    if (assistantMode) startListening();
+  });
+  return;
+}
+else if (text.includes("features") || text.includes("function") || text.includes("you do") || text.includes("u do")) {
+  reply = `
+ Heres what I can do for you:
+
+• I can search anything for you.
+  Just say “Google Virat Kohli” or “YouTube football goals”, and I will open it instantly.
+
+• I can answer basic questions about weather, time, date, facts, people, science and more.
+  Just talk to me naturally after i finish saying.
+
+• I can remember your tasks.
+  You can save a task by single tapping, and I will store it in your personal to-do list.
+  You can also ask me to show your tasks anytime.
+
+• I can play music for you.
+  Just say “play music” or “play a song”, and I will choose a random track.
+
+• I am your cute pet-like companion.
+  You can tap, double-tap and swipe to make me react with emotions.
+
+I am always here to help you, entertain you, and stay by your side!
+`;
+}
+
+
 
   // --- Default ---
   else {
@@ -386,19 +548,53 @@ else if (text.includes("todo") || text.includes("task") || text.includes("schedu
 // --- Toggle Assistant Mode on Double Tap ---
 let tapTimer = 0;
 document.addEventListener("dblclick", () => {
-  assistantMode = !assistantMode;
 
+// 🔴 STOP WIKIPEDIA (fetching or speaking)
+if (wikiLoading || wikiSpeaking) {
+
+  // Abort fetch if running
+  if (wikiController) wikiController.abort();
+  wikiLoading = false;
+
+  // Stop speech immediately
+  if (speechSynthesis.speaking) {
+    speechSynthesis.cancel();
+  }
+
+  wikiSpeaking = false;
+
+  // 📌 Now resume listening just like music
+  speak("Wikipedia stopped.", () => {
+    if (assistantMode) startListening();
+  });
+
+  return;
+}
+
+
+
+  // 🔴 Stop music immediately
+  if (!musicPlayer.paused) {
+    musicPlayer.pause();
+    musicPlayer.currentTime = 0;
+    speak("Music stopped.");
+    return;  // prevent toggling assistant when stopping music
+  }
+
+  assistantMode = !assistantMode;
+  
   if (assistantMode) {
-        speak("Namaste! I am the FACE. What can I do for you?", () => {
+    speak("Namaste! I am FACE", () => {
       startListening();
     });
-    eyesImg.src = waveGif; // face reacts
+    eyesImg.src = waveGif;
   } else {
     if (recognition) recognition.stop();
     speak("Going back to normal mode. Bye bye!");
     eyesImg.src = normalGif;
   }
 });
+
 
 
 // --- Eye animation ---
@@ -572,7 +768,6 @@ container.addEventListener("click", (e) => {
     todo.classList.toggle("hidden");
   }
 });
-
 
 
 
