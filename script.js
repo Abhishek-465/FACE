@@ -1,7 +1,6 @@
 // --- Element references ---
 const eyes = document.getElementById("eyes");
 const eyesImg = document.getElementById("eyesImg");
-const nose = document.getElementById("nose");
 const mouth = document.getElementById("mouth");
 const container = document.getElementById("container");
 const face = document.getElementById("face");
@@ -195,6 +194,44 @@ async function getWeather() {
 
   } catch (err) {
     return "I cannot fetch the weather because location access was blocked.";
+  }
+}
+
+// --- Gemini AI Chat ---
+async function askGemini(prompt) {
+  try {
+    const response = await fetch(
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=AIzaSyC0heA1CgBmpmSv5xjCfHZyXZhQVc4V-Jg",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                {
+                  text: prompt
+                }
+              ]
+            }
+          ]
+        })
+      }
+    );
+
+    const data = await response.json();
+
+    const reply =
+      data.candidates?.[0]?.content?.parts?.[0]?.text ||
+      "Sorry friend, my AI brain is confused right now.";
+
+    return reply;
+
+  } catch (err) {
+    console.error(err);
+    return "Something went wrong while contacting Gemini AI.";
   }
 }
 
@@ -536,9 +573,25 @@ I am always here to help you, entertain you, and stay by your side!
 
 
   // --- Default ---
-  else {
-    reply = "I didn't quite catch that, but I still love your energy!";
-  }
+  // --- Default AI Response ---
+else {
+
+  speak("Thinking please wait...", async () => {
+
+    const aiReply = await askGemini(
+      `You are FACE, a funny, emotional, cute AI robotic pet companion. 
+       Reply shortly and naturally like a friendly robot pet.Reply under 2 sentences.
+       User said: ${text}`
+    );
+
+    speak(aiReply, () => {
+      if (assistantMode) startListening();
+    });
+
+  });
+
+  return;
+}
 
     speak(reply, () => {
     if (assistantMode) startListening();
@@ -615,10 +668,7 @@ function changeEyes(gifPath, duration = 5000) {
 
 // --- Click interactions ---
 eyes.addEventListener("click", () => changeEyes(eyeChange1));
-nose.addEventListener("click", (e) => {
-  e.stopPropagation();
-  changeEyes(eyeChange2);
-});
+
 mouth.addEventListener("click", (e) => {
   e.stopPropagation();
   changeEyes(eyeChange3);
@@ -762,13 +812,24 @@ function saveTasks() {
 }
 
 container.addEventListener("click", (e) => {
-  // only toggle if the user clicks the white area, not nose/mouth/eyes
-  if (e.target === container) {
-    face.classList.toggle("hidden");
-    todo.classList.toggle("hidden");
-  }
-});
 
+  // ❌ Ignore ALL clicks inside todo section
+  if (todo.contains(e.target)) {
+    return;
+  }
+
+  // ❌ Ignore face interaction elements
+  if (
+    eyes.contains(e.target) ||
+    mouth.contains(e.target)
+  ) {
+    return;
+  }
+
+  // ✅ Toggle between face and todo
+  face.classList.toggle("hidden");
+  todo.classList.toggle("hidden");
+});
 
 
 
